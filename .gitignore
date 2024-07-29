@@ -1,32 +1,44 @@
-# Prerequisites
-*.d
+//Master-Slave RP2040 RX TX
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+#include <Arduino.h>
+#include <Adafruit_NeoPXL8.h>
 
-# Precompiled Headers
-*.gch
-*.pch
+int8_t pins[8] = { 16, 17, 18, 19, 20, 21, 22, 23 };
+#define COLOR_ORDER NEO_GRB
+#define COLS_LEDs 10  
+#define ROWS_LEDs 8  
+#define NUM_LEDS (COLS_LEDs * ROWS_LEDs / 8)
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
+Adafruit_NeoPXL8 leds(NUM_LEDS, pins, COLOR_ORDER);
 
-# Fortran module files
-*.mod
-*.smod
+void setup() {
+  Serial1.begin(9600); 
+  Serial.begin(9600);  
+  leds.begin();
+  leds.show(); 
+}
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
+void loop() {
+  if (Serial.available()) {
+    char command = Serial.read();
 
-# Executables
-*.exe
-*.out
-*.app
+    if (command == '1') {
+      
+      for (int i = 0; i < NUM_LEDS * 8; i++) {
+        leds.setPixelColor(i, leds.Color(255, 0, 0));
+      }
+      leds.show();
+      Serial1.println(command); 
+      Serial.println("ON");
+    } else if (command == '0') {
+      
+      for (int i = 0; i < NUM_LEDS * 8; i++) {
+        leds.setPixelColor(i, 0, 0, 0);
+      }
+      leds.show();
+      Serial1.println(command); 
+      Serial.println("OFF");
+    }
+  }
+}
+///// Master endlich 
