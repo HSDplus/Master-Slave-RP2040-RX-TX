@@ -1,5 +1,7 @@
 //Master-Slave RP2040 RX TX
-
+//*************************
+//**Master Part**
+//*************************
 #include <Arduino.h>
 #include <Adafruit_NeoPXL8.h>
 
@@ -41,4 +43,61 @@ void loop() {
     }
   }
 }
-///// Master endlich 
+//*************************
+//**Slave Part**
+//*************************
+
+#include <Arduino.h>
+#include <Adafruit_NeoPXL8.h>
+
+int8_t pins[8] = { 16, 17, 18, 19, 20, 21, 22, 23 };
+#define COLOR_ORDER NEO_GRB
+#define COLS_LEDs 10  
+#define ROWS_LEDs 8  
+#define NUM_LEDS (COLS_LEDs * ROWS_LEDs / 8)
+
+Adafruit_NeoPXL8 leds(NUM_LEDS, pins, COLOR_ORDER);
+
+void setup() {
+  Serial1.begin(9600); 
+  Serial.begin(9600);  
+  leds.begin();
+  leds.show(); 
+}
+
+void loop() {
+  if (Serial1.available()) {
+    char command = Serial1.read();
+
+    if (command == '1') {
+      // Alle LEDs auf Weiß setzen
+      for (int i = 0; i < NUM_LEDS * 8; i++) {
+        leds.setPixelColor(i, leds.Color(255, 0, 0));
+      }
+      leds.show();
+      Serial.println("LEDs ON");
+    } else if (command == '0') {
+      
+      for (int i = 0; i < NUM_LEDS * 8; i++) {
+        leds.setPixelColor(i, 0, 0, 0);
+      }
+      leds.show();
+      Serial.println("LEDs OFF");
+    }
+
+    
+    delay(1);
+    Serial1.println(command);
+  }
+}
+// slave 
+
+
+
+
+
+
+
+
+
+
